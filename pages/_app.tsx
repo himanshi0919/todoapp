@@ -1,6 +1,23 @@
-import '@/styles/globals.css'
-import type { AppProps } from 'next/app'
+import React, { ReactElement } from 'react';
 
-export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+import Header from '@/components/Header';
+import '@/styles/globals.css';
+
+interface AppProps {
+  Component: React.FC;
+  pageProps: any;
 }
+
+const App: React.FC<AppProps> = ({ Component, pageProps }): ReactElement => {
+  return (
+    <>
+      <Header/>
+      <div className="container mx-auto min-h-screen">
+        <Component {...pageProps} />
+      </div>
+      
+    </>
+  );
+};
+
+export default App;

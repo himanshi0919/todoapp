@@ -1,34 +1,46 @@
-import Image from 'next/image';
-import { Inter } from 'next/font/google';
-import { useState } from 'react';
-
-const inter = Inter({ subsets: ['latin'] });
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 interface Todo {
   title: string;
   desc: string;
-  status: number;
 }
 
-export default function Home() {
-  const [todo, setTodo] = useState<Todo>({ title: '', desc: '', status: 0 });
+const Edit: React.FC = () => {
+  const router = useRouter();
+  const { title } = router.query;
+
+  const [todo, setTodo] = useState<Todo>({ title: '', desc: '' });
 
   const updateTodo = () => {
     let todos = localStorage.getItem('todos');
     if (todos) {
       let todosJson = JSON.parse(todos);
-      if (todosJson.filter((value: Todo) => value.title === todo.title).length > 0) {
-        alert('Todo with this title already exists');
-      } else {
-        todosJson.push(todo);
+      if (todosJson.filter((value: Todo) => value.title === title).length > 0) {
+        let index = todosJson.findIndex((value: Todo) => value.title === title);
+        todosJson[index].title = todo.title;
+        todosJson[index].desc = todo.desc;
         localStorage.setItem('todos', JSON.stringify(todosJson));
-        alert('Todo has been added');
-        setTodo({ title: '', desc: '', status: 0 });
+        alert('Todo has been updated');
+      } else {
+        alert('Todo does not exist');
       }
     } else {
       localStorage.setItem('todos', JSON.stringify([todo]));
     }
   };
+
+  useEffect(() => {
+    let todos = localStorage.getItem('todos');
+    if (todos) {
+      let todosJson = JSON.parse(todos);
+      let ftodo = todosJson.filter((e: Todo) => title === e.title);
+      console.log(ftodo);
+      if (ftodo.length > 0) {
+        setTodo(ftodo[0]);
+      }
+    }
+  }, [router.isReady]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTodo({ ...todo, [e.target.name]: e.target.value });
@@ -40,7 +52,7 @@ export default function Home() {
       <section className="text-gray-600 body-font">
         <div className="container px-5 py-24 mx-auto flex flex-wrap items-center">
           <div className="bg-gray-100 rounded-lg p-8 flex flex-col md:ml-auto w-full mt-10 md:mt-0">
-            <h2 className="text-gray-900 text-lg font-medium title-font mb-5">Add a Todo</h2>
+            <h2 className="text-gray-900 text-lg font-medium title-font mb-5">Update a Todo</h2>
             <div className="relative mb-4">
               <label htmlFor="title" className="leading-7 text-sm text-gray-600">
                 Todo Title
@@ -71,15 +83,14 @@ export default function Home() {
               onClick={updateTodo}
               className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none w-fit hover:bg-indigo-600 rounded text-lg"
             >
-              Add Todo
+              Update Todo
             </button>
-            <p className="text-xs text-gray-500 mt-3">Todo List App</p>
+            <p className="text-xs text-gray-500 mt-3">The best todo list app out there!</p>
           </div>
         </div>
       </section>
     </div>
   );
-}
+};
 
-
-
+export default Edit;
